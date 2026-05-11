@@ -5,46 +5,95 @@
 
 通过 Tampermonkey 抓取当前 ChatGPT 页面内容，把当前 ChatGPT 对话保存为本地文件。
 
-本项目提供两种方式：
+本项目提供两类方案：
 
 - 免 Python 版本：直接保存 HTML，适合新手和轻量使用
 - Flask 版本：保存 Markdown + HTML，适合配合 Obsidian 做长期归档
 
+## 功能
+
+- 保存当前 ChatGPT 对话
+- 支持自动保存
+- 支持右下角按钮手动保存
+- 支持 HTML 保存
+- Flask 版本支持 Markdown + HTML 保存
+
 
 ## 推荐：免 Python 版本
+> 感谢 syzgg 的指点：这个版本使用 File System Access API，可以不依赖 Python 服务，直接由浏览器写入本地文件。
 
-如果你只是想把 ChatGPT 对话保存成 HTML，推荐使用 `tampermonkey-file-access.user.js`。
 
-这个版本使用浏览器的 File System Access API，不需要 Python，不需要 Flask，也不需要启动本地服务。
 
-感谢 syzgg 的指点。
+如果你只是想把 ChatGPT 对话保存成 HTML，推荐使用 File System Access API 版本。
 
-### 特点
+这个版本不需要 Python，不需要 Flask，也不需要启动本地服务。
 
-- 不需要运行 Python 服务
-- 第一次使用时选择一个本地保存文件夹
-- 之后点击按钮即可把当前 ChatGPT 对话保存为 `.html`
+目前提供两个脚本：
+
+| 脚本                                    | 保存方式            | 适合场景                   |
+| --------------------------------------- | ------------------- | -------------------------- |
+| `tampermonkey-file-access-auto.user.js` | 自动保存 + 手动保存 | 推荐大多数用户使用         |
+| `tampermonkey-file-access.user.js`      | 手动保存            | 喜欢自己控制保存时机的用户 |
+
+
+
+### 自动保存版
+
+文件名：
+
+```text
+tampermonkey-file-access-auto.user.js
+```
+
+效果：
+
+- 不需要 Python
+- 第一次点击 `选择保存文件夹`
+- 选择文件夹后，当前页面会自动保存
+- ChatGPT 内容变化后，停止变化 8 秒自动保存
+- 也可以随时点击按钮手动保存
+- 同一个对话会覆盖保存到同一个 `.html` 文件
 - 保存的 HTML 文件可以直接用浏览器打开
 
 
-### 使用步骤
+使用步骤：
 
 1. 使用 Chrome 或 Edge 浏览器。
 2. 安装 Tampermonkey 扩展。
 3. 新建用户脚本。
-4. 将 `tampermonkey-file-access.user.js` 的内容复制进去并保存。
+4. 将 `tampermonkey-file-access-auto.user.js` 的内容复制进去并保存。
 5. 打开或刷新 ChatGPT 页面。
 6. 点击右下角的 `选择保存文件夹`。
 7. 选择一个本地文件夹。
-8. 之后点击 `保存 HTML`，即可保存当前对话。
+8. 之后页面内容变化时会自动保存。
+9. 也可以随时点击 `保存 HTML` 手动保存当前对话。
+
+### 手动保存版
+
+文件名：
+
+```text
+tampermonkey-file-access.user.js
+```
+
+效果：
+
+- 不需要 Python
+- 第一次点击 `选择保存文件夹`
+- 之后点击 `保存 HTML` 手动保存当前对话
+- 同一个对话会覆盖保存到同一个 `.html` 文件
+
+
+适合喜欢自己决定什么时候保存的用户。
 
 ### 注意事项
 
 - File System Access API 主要支持 Chrome / Edge。
 - Firefox / Safari 可能无法使用。
 - 第一次选择文件夹必须由用户点击触发。
-- 浏览器可能在清理缓存、切换站点权限或重启后要求重新选择文件夹。
-- 这个版本只保存当前打开的 ChatGPT 对话，不能一次性导出所有历史对话。
+- 自动保存版选择文件夹后，当前页面会话中可以自动保存。
+- 浏览器可能在刷新页面、清理缓存、切换站点权限或重启后要求重新选择文件夹。
+- 这两个版本都只保存当前打开的 ChatGPT 对话，不能一次性导出所有历史对话。
 
 ## 进阶：Flask 版本
 
@@ -196,32 +245,48 @@ shell:startup
 
 - 本工具只能保存当前打开过的 ChatGPT 对话。
 - 不能一次性抓取账号里的所有历史会话。
-- File System Access API 版本主要支持 Chrome / Edge。
 - Flask 版本需要 Python 服务保持运行。
 - 如果关闭 Python 服务窗口，Flask 版本会保存失败。
+- 本工具不主动上传内容到第三方服务器。
 - ChatGPT 页面结构可能变化，若脚本失效，需要更新选择器或脚本逻辑。
 
+## 方案对比
+
+| 方案                                         | 是否需要 Python | 保存格式        | 保存方式                | 适合场景                           |
+| -------------------------------------------- | --------------- | --------------- | ----------------------- | ---------------------------------- |
+| `tampermonkey-file-access-auto.user.js`      | 不需要          | HTML            | 自动保存 + 手动保存     | 推荐新手和大多数用户               |
+| `tampermonkey-file-access.user.js`           | 不需要          | HTML            | 手动保存                | 喜欢自己控制保存时机               |
+| `tampermonkey.user.js` + `save_chat.py`      | 需要            | Markdown + HTML | 自动保存   + 手动保存   | 配合 Obsidian、分类归档、长期管理  |
+| `tampermonkey.user.js` + `save_html_only.py` | 需要            | HTML            | 自动保存     + 手动保存 | 想用 Flask 统一接收，但只保存 HTML |
 
 ## 常见问题
 
 ### 推荐新手用哪个版本？
 
-推荐使用 `tampermonkey-file-access.user.js`。
+推荐使用 `tampermonkey-file-access-auto.user.js`。
 
-它不需要 Python，也不需要启动本地服务，直接选择文件夹后就能保存 HTML。
+它不需要 Python，也不需要启动本地服务。第一次选择保存文件夹后，就可以自动保存 HTML，也可以随时手动保存。
+
 
 ### 为什么还保留 Flask 版本？
 
 Flask 版本更适合长期归档，尤其是配合 Obsidian 使用时，可以同时保存 Markdown 和 HTML。
-而且可以自动保存，不需要手动点击保存。
+
+同时，Flask 版本也不依赖 Obsidian。它本质上只是把 Markdown 和 HTML 文件保存到普通文件夹。
 
 ### 如果不用 Obsidian 可以使用吗？
 
 可以。
 
-Flask 版本不依赖 Obsidian，本质上只是把 Markdown 和 HTML 文件保存到普通文件夹。
+Flask 版本不依赖 Obsidian，你可以把 `vault_dir` 改成任意本地目录，例如：
 
-主包只是最近被朋友种草了Obsidian而已，哈哈。
+```python
+vault_dir = Path("D:/ChatGPT_Saves")
+```
+
+这样也会正常生成 `.md` 和 `.html` 文件。
+
+如果只是想快速保存 HTML，也可以使用免 Python 版本。
 
 ### HTML 文件怎么看？
 
