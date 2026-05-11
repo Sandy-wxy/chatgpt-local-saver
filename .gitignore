@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.DS_Store
+Thumbs.db
+
+# 不要把自己的聊天记录上传
+saved/
+exports/
+*.md
+*.html
