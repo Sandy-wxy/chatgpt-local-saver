@@ -213,6 +213,7 @@ shell:startup
 ### 为什么还保留 Flask 版本？
 
 Flask 版本更适合长期归档，尤其是配合 Obsidian 使用时，可以同时保存 Markdown 和 HTML。
+而且可以自动保存，不需要手动点击保存。
 
 ### 如果不用 Obsidian 可以使用吗？
 
